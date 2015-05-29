@@ -55,16 +55,59 @@ packages.each do |name|
   package name
 end
 
-remote_file nginx_url do
-  source   nginx_url
-  checksum node['nginx']['source']['checksum']
-  path     src_filepath
-  backup   false
+
+if node['nginx']['source']['dl_strategy'] == "repo"
+  
+  package     'mercurial'
+  #repo_path = "#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['nginx']['source']['version']}/nginx-#{node['nginx']['source']['version']}/"
+  repo_path = "#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['nginx']['source']['version']}"
+  
+
+  mercurial repo_path do
+    repository node['nginx']['source']['repo']
+    reference  node['nginx']['source']['tag']
+    path       repo_path
+    action     :clone
+  end
+
+  file "#{repo_path}/configure" do
+    mode    0755
+    action  :create
+    content "#{repo_path}/auto/configure"
+    not_if { ::File.exist? "#{repo_path}/configure" }
+  end
+
+else
+
+  remote_file nginx_url do
+    source   nginx_url
+    checksum node['nginx']['source']['checksum']
+    backup   false
+    path src_filepath
+  end
+
+
+
+  # source install depends on the existence of the `tar` package
+  package 'tar'
+
+  # Unpack downloaded source so we could apply nginx patches
+  # in custom modules - example http://yaoweibin.github.io/nginx_tcp_proxy_module/
+  # patch -p1 < /path/to/nginx_tcp_proxy_module/tcp.patch
+  bash 'unarchive_source' do
+    cwd  ::File.dirname(src_filepath)
+    code <<-EOH
+      tar zxf #{::File.basename(src_filepath)} -C #{::File.dirname(src_filepath)}
+    EOH
+    not_if { ::File.directory?("#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['nginx']['source']['version']}") }
+  end
+
 end
 
 node.run_state['nginx_force_recompile'] = false
 node.run_state['nginx_configure_flags'] =
   node['nginx']['source']['default_configure_flags'] | node['nginx']['configure_flags']
+
 
 include_recipe 'nginx::commons_conf'
 
@@ -76,19 +119,7 @@ cookbook_file "#{node['nginx']['dir']}/mime.types" do
   notifies :reload, 'service[nginx]', :delayed
 end
 
-# source install depends on the existence of the `tar` package
-package 'tar'
 
-# Unpack downloaded source so we could apply nginx patches
-# in custom modules - example http://yaoweibin.github.io/nginx_tcp_proxy_module/
-# patch -p1 < /path/to/nginx_tcp_proxy_module/tcp.patch
-bash 'unarchive_source' do
-  cwd  ::File.dirname(src_filepath)
-  code <<-EOH
-    tar zxf #{::File.basename(src_filepath)} -C #{::File.dirname(src_filepath)}
-  EOH
-  not_if { ::File.directory?("#{Chef::Config['file_cache_path'] || '/tmp'}/nginx-#{node['nginx']['source']['version']}") }
-end
 
 node['nginx']['source']['modules'].each do |ngx_module|
   include_recipe ngx_module
@@ -96,6 +127,7 @@ end
 
 configure_flags       = node.run_state['nginx_configure_flags']
 nginx_force_recompile = node.run_state['nginx_force_recompile']
+
 
 bash 'compile_nginx_source' do
   cwd  ::File.dirname(src_filepath)
