@@ -100,12 +100,11 @@ if node['nginx']['source']['dl_strategy'] == "repo"
     action     :clone
   end
 
-  file "#{repo_path}/configure" do
-    mode    0755
-    action  :create
-    content "#{repo_path}/auto/configure"
-    not_if { ::File.exist? "#{repo_path}/configure" }
+  link "#{repo_path}/configure" do
+    to "#{repo_path}/auto/configure"
+    not_if { ( ::File.exist? "#{repo_path}/configure" ) || (not ::File.exist? "#{repo_path}/auto/configure")  }
   end
+
 
 else
 
@@ -137,6 +136,8 @@ end
 node.run_state['nginx_force_recompile'] = false
 node.run_state['nginx_configure_flags'] =
   node['nginx']['source']['default_configure_flags'] | node['nginx']['configure_flags']
+
+
 
 
 include_recipe 'nginx::commons_conf'
