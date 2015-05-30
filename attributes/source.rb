@@ -21,26 +21,58 @@
 
 include_attribute 'nginx::default'
 
-default['nginx']['source']['version']                 = node['nginx']['version']
-default['nginx']['source']['prefix']                  = "/opt/nginx-#{node['nginx']['source']['version']}"
-default['nginx']['source']['conf_path']               = "#{node['nginx']['dir']}/nginx.conf"
-default['nginx']['source']['sbin_path']               = "#{node['nginx']['source']['prefix']}/sbin/nginx"
-default['nginx']['source']['default_configure_flags'] = %W(
-  --prefix=#{node['nginx']['source']['prefix']}
-  --conf-path=#{node['nginx']['dir']}/nginx.conf
-  --sbin-path=#{node['nginx']['source']['sbin_path']}
-)
 
 #dl_strategy should be 'repo' or 'tarball'
 default['nginx']['source']['dl_strategy'] = 'repo'
 default['nginx']['source']['repo']        = "http://hg.nginx.org/nginx"
-default['nginx']['source']['tag']         = "release-#{node['nginx']['source']['version']}"
 default['nginx']['configure_flags']       = []
-default['nginx']['source']['version']     = node['nginx']['version']
-default['nginx']['source']['url']         = "http://nginx.org/download/nginx-#{node['nginx']['source']['version']}.tar.gz"
 default['nginx']['source']['checksum']    = 'b5608c2959d3e7ad09b20fc8f9e5bd4bc87b3bc8ba5936a513c04ed8f1391a18'
 default['nginx']['source']['modules']     = %w(
   nginx::http_ssl_module
   nginx::http_gzip_static_module
 )
 default['nginx']['source']['use_existing_user'] = false
+
+
+
+# Attributes below are derived from the ones above
+#
+# The problem with setting these defaults here is that if you override 
+# one of the attributes above in a given recipe
+# the attributes derived from the changed original attributes will still
+# be as they were if derived from the default values. Thus, set these
+# to nil by default, and define them with the original definitions
+# from the original attributes in the recipe itself, but only if these
+# attributes are still set to nil (not user specified)
+#
+default['nginx']['source']['version']                 = nil
+default['nginx']['source']['prefix']                  = nil
+default['nginx']['source']['conf_path']               = nil
+default['nginx']['source']['sbin_path']               = nil
+default['nginx']['source']['default_configure_flags'] = nil
+
+
+default['nginx']['source']['tag']                     = nil
+default['nginx']['source']['url']                     = nil
+
+
+# These are the original values for the derived attributes above, commented out
+#
+#default['nginx']['source']['version']                 = node['nginx']['version']
+#default['nginx']['source']['prefix']                  = "/opt/nginx-#{node['nginx']['source']['version']}"
+#default['nginx']['source']['conf_path']               = "#{node['nginx']['dir']}/nginx.conf"
+#default['nginx']['source']['sbin_path']               = "#{node['nginx']['source']['prefix']}/sbin/nginx"
+#default['nginx']['source']['default_configure_flags'] = %W(
+#  --prefix=#{node['nginx']['source']['prefix']}
+#  --conf-path=#{node['nginx']['dir']}/nginx.conf
+#  --sbin-path=#{node['nginx']['source']['sbin_path']}
+#)
+#
+#
+#
+#default['nginx']['source']['tag']         = "release-#{node['nginx']['source']['version']}"
+#default['nginx']['source']['url']         = "http://nginx.org/download/nginx-#{node['nginx']['source']['version']}.tar.gz"
+
+
+
+

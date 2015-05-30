@@ -25,6 +25,35 @@
 # deterministically (resolved in Chef 11).
 node.load_attribute_by_short_filename('source', 'nginx') if node.respond_to?(:load_attribute_by_short_filename)
 
+
+
+
+# define attributes that derive from other attributes, if they are not user-defined
+# This needs to be done here, not in the attributes file, because otherwise these have the
+# wrong value if the original attributes are user-defined, but the derived attributes are not user-defined
+node.default['nginx']['source']['version']                 = node['nginx']['source']['version']   || node['nginx']['version']
+node.default['nginx']['source']['prefix']                  = node['nginx']['source']['prefix']    || "/opt/nginx-#{node['nginx']['source']['version']}"
+node.default['nginx']['source']['conf_path']               = node['nginx']['source']['conf_path'] || "#{node['nginx']['dir']}/nginx.conf"
+node.default['nginx']['source']['sbin_path']               = node['nginx']['source']['sbin_path'] || "#{node['nginx']['source']['prefix']}/sbin/nginx"
+node.default['nginx']['source']['default_configure_flags'] = %W(
+  --prefix=#{node['nginx']['source']['prefix']}
+  --conf-path=#{node['nginx']['dir']}/nginx.conf
+  --sbin-path=#{node['nginx']['source']['sbin_path']}
+)
+
+
+node.default['nginx']['source']['tag']         = node['nginx']['source']['tag'] || "release-#{node['nginx']['source']['version']}"
+node.default['nginx']['source']['url']         = node['nginx']['source']['url'] || "http://nginx.org/download/nginx-#{node['nginx']['source']['version']}.tar.gz"
+
+
+
+
+
+
+
+
+
+
 nginx_url = node['nginx']['source']['url'] ||
             "http://nginx.org/download/nginx-#{node['nginx']['source']['version']}.tar.gz"
 
@@ -54,6 +83,7 @@ packages = value_for_platform_family(
 packages.each do |name|
   package name
 end
+
 
 
 if node['nginx']['source']['dl_strategy'] == "repo"
