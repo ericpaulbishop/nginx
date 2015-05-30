@@ -23,7 +23,7 @@ include_attribute 'nginx::default'
 
 
 #dl_strategy should be 'repo' or 'tarball'
-default['nginx']['source']['dl_strategy'] = 'repo'
+default['nginx']['source']['dl_strategy'] = 'tarball'  #switch to 'repo' to clone mercurial repo
 default['nginx']['source']['repo']        = "http://hg.nginx.org/nginx"
 default['nginx']['configure_flags']       = []
 default['nginx']['source']['checksum']    = 'b5608c2959d3e7ad09b20fc8f9e5bd4bc87b3bc8ba5936a513c04ed8f1391a18'
