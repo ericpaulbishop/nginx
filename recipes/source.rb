@@ -44,8 +44,7 @@ node.default['nginx']['source']['default_configure_flags'] = %W(
 
 node.default['nginx']['source']['tag']         = node['nginx']['source']['tag'] || "release-#{node['nginx']['source']['version']}"
 node.default['nginx']['source']['url']         = node['nginx']['source']['url'] || "http://nginx.org/download/nginx-#{node['nginx']['source']['version']}.tar.gz"
-
-
+node.default['nginx']['source']['checksum']    = node['nginx']['source']['checksum'] || node['nginx']['source']['known_checksums'][ node['nginx']['source']['version'] ] || node['nginx']['source']['known_checksums'][ '1.6.2' ]
 
 
 
