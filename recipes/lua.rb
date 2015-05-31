@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+node.default['nginx']['lua']['url']      = node['nginx']['lua']['url']    || "https://github.com/chaoslawful/lua-nginx-module/archive/v#{node['nginx']['lua']['version']}.tar.gz"
+node.default['nginx']['luajit']['url']   = node['nginx']['luajit']['url'] || "http://luajit.org/download/LuaJIT-#{node['nginx']['luajit']['version']}.tar.gz"
+
 luajit_src_filename = ::File.basename(node['nginx']['luajit']['url'])
 luajit_src_filepath = "#{Chef::Config['file_cache_path']}/#{luajit_src_filename}"
 luajit_extract_path = "#{Chef::Config['file_cache_path']}/luajit-#{node['nginx']['luajit']['version']}"

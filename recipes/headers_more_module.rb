@@ -18,6 +18,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+node.default['nginx']['headers_more']['source_url']      = node['nginx']['headers_more']['source_url'] || "https://github.com/openresty/headers-more-nginx-module/archive/v#{node['nginx']['headers_more']['version']}.tar.gz"
+
 tar_location = "#{Chef::Config['file_cache_path']}/headers_more.tar.gz"
 module_location = "#{Chef::Config['file_cache_path']}/headers_more/#{node['nginx']['headers_more']['source_checksum']}"
 

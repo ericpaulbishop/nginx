@@ -19,6 +19,9 @@
 # limitations under the License.
 #
 
+node.default['nginx']['naxsi']['url'] = node['nginx']['naxsi']['url'] || "https://github.com/nbs-system/naxsi/archive/#{node['nginx']['naxsi']['version']}.tar.gz"
+
+
 cookbook_file "#{node['nginx']['dir']}/naxsi_core.rules" do
   source 'naxsi_core.rules'
   owner  'root'

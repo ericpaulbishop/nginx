@@ -19,6 +19,8 @@
 # limitations under the License.
 #
 
+node.default['nginx']['devel']['url']   = node['nginx']['devel']['url'] || "https://github.com/simpl/ngx_devel_kit/archive/v#{node['nginx']['devel']['version']}.tar.gz"
+
 devel_src_filename = ::File.basename(node['nginx']['devel']['url'])
 devel_src_filepath = "#{Chef::Config['file_cache_path']}/#{devel_src_filename}"
 devel_extract_path = "#{Chef::Config['file_cache_path']}/nginx-devel-#{node['nginx']['devel']['version']}"

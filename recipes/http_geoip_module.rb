@@ -19,6 +19,10 @@
 # limitations under the License.
 #
 
+lib_version                                = node['nginx']['geoip']['lib_version'] # convenience variable for line length
+node.default['nginx']['geoip']['lib_url']  = node['nginx']['geoip']['lib_url'] || "https://github.com/maxmind/geoip-api-c/releases/download/v#{lib_version}/GeoIP-#{lib_version}.tar.gz"
+
+
 country_dat          = "#{node['nginx']['geoip']['path']}/GeoIP.dat"
 country_src_filename = ::File.basename(node['nginx']['geoip']['country_dat_url'])
 country_src_filepath = "#{Chef::Config['file_cache_path']}/#{country_src_filename}"

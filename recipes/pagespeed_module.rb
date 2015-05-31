@@ -3,6 +3,10 @@
 # Recipe:: pagespeed_module
 #
 
+node.default['nginx']['pagespeed']['url']     = node['nginx']['pagespeed']['url'] || "https://github.com/pagespeed/ngx_pagespeed/archive/release-#{node['nginx']['pagespeed']['version']}-beta.tar.gz"
+node.default['nginx']['psol']['url']          = node['nginx']['psol']['url']      || "https://dl.google.com/dl/page-speed/psol/#{node['nginx']['pagespeed']['version']}.tar.gz"
+
+
 src_filename = ::File.basename(node['nginx']['pagespeed']['url'])
 src_filepath = "#{Chef::Config['file_cache_path']}/#{src_filename}"
 extract_path = "#{Chef::Config['file_cache_path']}/nginx_pagespeed-#{node['nginx']['pagespeed']['version']}"

@@ -19,6 +19,8 @@
 # limitations under the License.
 #
 
+node.default['nginx']['echo']['url']   = node['nginx']['echo']['url'] || "https://github.com/openresty/echo-nginx-module/archive/v#{node['nginx']['echo']['version']}.tar.gz"
+
 echo_src_filename = "echo-nginx-module-v#{node['nginx']['echo']['version']}.tar.gz"
 echo_src_filepath = "#{Chef::Config['file_cache_path']}/#{echo_src_filename}"
 echo_extract_path = "#{Chef::Config['file_cache_path']}/nginx_echo_module/#{node['nginx']['echo']['checksum']}"

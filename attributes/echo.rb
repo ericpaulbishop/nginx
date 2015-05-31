@@ -20,5 +20,7 @@
 #
 
 default['nginx']['echo']['version']        = '0.57'
-default['nginx']['echo']['url']            = "https://github.com/openresty/echo-nginx-module/archive/v#{node['nginx']['echo']['version']}.tar.gz"
 default['nginx']['echo']['checksum']       = '8467237ca0fae74ca7a32fbd34fc6044df307098415d48068214c9c235695a07'
+
+default['nginx']['echo']['url']            = nil
+#default['nginx']['echo']['url']            = "https://github.com/openresty/echo-nginx-module/archive/v#{node['nginx']['echo']['version']}.tar.gz"
