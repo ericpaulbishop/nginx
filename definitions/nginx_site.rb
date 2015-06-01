@@ -24,8 +24,12 @@ define :nginx_site, :enable => true, :timing => :delayed do
 
     if params[:template]
       template "#{node['nginx']['dir']}/sites-available/#{params[:name]}" do
-        source params[:template]
-        variables(params[:variables])
+        source     params[:template]
+        cookbook   params[:template_cookbook]  if params[:template_cookbook]
+        local      params[:template_is_local]  if params[:template_is_local]
+        mode       '0644'
+        owner      'root'
+        variables( :params => params )
       end
     end
 
