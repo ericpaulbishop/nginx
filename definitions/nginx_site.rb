@@ -29,7 +29,7 @@ define :nginx_site, :enable => true, :timing => :delayed do
         local      params[:template_is_local]  if params[:template_is_local]
         mode       '0644'
         owner      'root'
-        variables( :params => params )
+        variables( :params => params[:template_params] )
       end
     end
 

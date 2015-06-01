@@ -1,16 +1,16 @@
 server
 {
-	server_name          <%= (@params['server_name']).kind_of?(Array) ? (@params['server_name']).join(' ') : ( @params['server_name'] ?  @params['server_name'] : node['hostname'] )    -%>;
-	listen               <%= (@params['port']).to_s                                                                                                                                     -%>;
-	root                 <%= @params['root']                                                                                                                                            -%>;
-	index                <%= (@params['index']).kind_of?(Array)  ? (@params['index']).join(' ') : ( @params['index'] ?  @params['index'] : 'index.html index.htm index.php index.cgi') -%>;
+	server_name          <%= (@params['server_name']).kind_of?(Array) ? (@params['server_name']).join(' ') : ( @params['server_name'] ?  @params['server_name'] : node['hostname'] )    %>;
+	listen               <%= (@params['port']).to_s                                                                                                                                     %>;
+	root                 <%= @params['root']                                                                                                                                            %>;
+	index                <%= (@params['index']).kind_of?(Array)  ? (@params['index']).join(' ') : ( @params['index'] ?  @params['index'] : 'index.html index.htm index.php index.cgi') %>;
 
-	<%= (@params['log_file']).nil? ? '' : @params['log_file'] -%>;
+	<%= (@params['log_file']).nil? ? '' : 'log file             ' + @params['log_file'] + ";" %>
 	
 	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl                  on;" : "" -%>;
-	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl_certificate      #{ @params['ssl_cert'] };" : "" -%>;
-	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl_certificate_key  #{ @params['ssl_key'] };"  : "" -%>;
-	                                                    error_page           
+	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl_certificate      #{ @params['ssl_cert'] };" : "" %>;
+	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl_certificate_key  #{ @params['ssl_key'] };"  : "" %>;
+	
 	<%- if @params['error_pages'] -%>
 	<%-   (@params['error_pages']).each do | err_num, url | -%>
 	<%= "error_page           " + err_num.to_s + "   " + url.to_s + ";"%>
@@ -31,7 +31,7 @@ server
 
 
 	#php
-	location ~ \.php\$
+	#location ~ \.php\$
         #{
         #	try_files      \$uri =404;
         #	fastcgi_pass   unix:/var/run/php-fpm.sock ;
