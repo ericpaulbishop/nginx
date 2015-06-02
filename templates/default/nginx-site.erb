@@ -46,7 +46,8 @@ server
 
 	<%- if @params['enable_php'] -%>
 	#php
-	location ~ .php$
+	location ~ <%= @params['php_location_match'] ? @params['php_location_match'] :  '\.php$' %>
+
         {
         	try_files      $uri =404;
 		fastcgi_pass   <%= @params['php_fastcgi_socket'] ? @params['php_fastcgi_socket'] : "unix:/var/run/php5-fpm.sock" %>;
@@ -56,7 +57,7 @@ server
 
 	<%- if @params['enable_fcgiwrap'] -%>
 	#fcgiwrap
-	location ~ <%= @params['fcgiwrap_location_match'] ? @params['fcgiwrap_location_match'] :  '.cgi$' %>
+	location ~ <%= @params['fcgiwrap_location_match'] ? @params['fcgiwrap_location_match'] :  '\.cgi$' %>
         {
 		fastcgi_pass   <%= @params['fcgiwrap_fastcgi_socket'] ? @params['fcgiwrap_fastcgi_socket'] : "unix:/var/run/fcgiwrap.socket" %> ;
 		include        <%= node['nginx']['dir'] %>/fastcgi.conf;
