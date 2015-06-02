@@ -7,9 +7,9 @@ server
 
 	<%= (@params['log_file']).nil? ? '' : 'log file             ' + @params['log_file'] + ";" %>
 	
-	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl                  on;" : "" -%>;
-	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl_certificate      #{ @params['ssl_cert'] };" : "" %>;
-	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl_certificate_key  #{ @params['ssl_key'] };"  : "" %>;
+	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl                  on;" : "" -%>
+	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl_certificate      #{ @params['ssl_cert'] };" : "" %>
+	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl_certificate_key  #{ @params['ssl_key'] };"  : "" %>
 	
 	<%- if @params['error_pages'] -%>
 	<%-   (@params['error_pages']).each do | err_num, url | -%>
@@ -27,8 +27,8 @@ server
 	<%= (@params['passenger_enabled']).nil? ? '' : 'passenger_enabled   on;'  %>
 	
 	<%-  @params['passenger_app_env'] = @params['passenger_app_env'] || @params['rack_env'] || @params['rails_env'] -%>
-	<%= (@params['passenger_app_env']).nil? ? ''  : "passenger_app_env   #{@params['passenger_app_env'])};"%>
-	<%= (@params['passenger_app_root']).nil? ? '' : "passenger_app_root  #{@params['passenger_app_root'])};"%>
+	<%= (@params['passenger_app_env']).nil? ? ''  : "passenger_app_env   #{@params['passenger_app_env']};" %>
+	<%= (@params['passenger_app_root']).nil? ? '' : "passenger_app_root  #{@params['passenger_app_root']};"%>
 
 
 

@@ -59,12 +59,11 @@ nginx_url = node['nginx']['source']['url'] ||
 node.set['nginx']['binary']          = node['nginx']['source']['sbin_path']
 node.set['nginx']['daemon_disable']  = true
 
-unless node['nginx']['source']['use_existing_user']
-  user node['nginx']['user'] do
-    system true
-    shell  '/bin/false'
-    home   '/var/www'
-  end
+user node['nginx']['user'] do
+  system true
+  shell  '/bin/false'
+  home   '/var/www'
+  not_if { node['nginx']['source']['use_existing_user'] }
 end
 
 include_recipe 'nginx::ohai_plugin'
@@ -248,13 +247,12 @@ else
     mode   '0755'
   end if generate_init
 
-  if generate_template
-    template defaults_path do
-      source 'nginx.sysconfig.erb'
-      owner  'root'
-      group  node['root_group']
-      mode   '0644'
-    end
+  template defaults_path do
+    source 'nginx.sysconfig.erb'
+    owner  'root'
+    group  node['root_group']
+    mode   '0644'
+    only_if { generate_template }
   end
 
   service 'nginx' do
