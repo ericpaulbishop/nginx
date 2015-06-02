@@ -1,9 +1,9 @@
 server
 {
 	server_name          <%= (@params['server_name']).kind_of?(Array) ? (@params['server_name']).join(' ') : ( @params['server_name'] ?  @params['server_name'] : node['hostname'] )    %>;
-	listen               <%= (@params['port']).to_s                                                                                                                                     %>;
+	listen               <%= @params['port'] ? (@params['port']).to_s : (@params['ssl_cert'] && @params['ssl_key']   ? '443' : '80' )                                                   %>;
 	root                 <%= @params['root']                                                                                                                                            %>;
-	index                <%= (@params['index']).kind_of?(Array)  ? (@params['index']).join(' ') : ( @params['index'] ?  @params['index'] : 'index.html index.htm index.php index.cgi') %>;
+	index                <%= (@params['index']).kind_of?(Array)  ? (@params['index']).join(' ') : ( @params['index'] ?  @params['index'] : 'index.html index.htm index.php index.cgi')  %>;
 
 	<%= (@params['log_file']).nil? ? '' : 'log file             ' + @params['log_file'] + ";" %>
 	
@@ -24,25 +24,45 @@ server
 	<%-   end -%>
 	<%- end -%>
 
+	<%= (@params['passenger_enabled']).nil? ? '' : 'passenger_enabled   on;'  %>
+	
+	<%-  @params['passenger_app_env'] = @params['passenger_app_env'] || @params['rack_env'] || @params['rails_env'] -%>
+	<%= (@params['passenger_app_env']).nil? ? ''  : "passenger_app_env   #{@params['passenger_app_env'])};"%>
+	<%= (@params['passenger_app_root']).nil? ? '' : "passenger_app_root  #{@params['passenger_app_root'])};"%>
 
 
-	#passenger_enabled   on;
-	#passenger_base_uri  $rails_base_path; ##should be symlink to public dir of actual rails_app 
+
+	<%- if (@params['passenger_base_uri']).kind_of?(Array) -%>
+	<%-   (@params['passenger_base_uri']).each do |uri|    -%>
+	passenger_base_uri   <%= uri %>; ##should be symlink to public dir of actual rails_app 
+	<%-   end -%>
+	<%- elsif (@params['passenger_base_uri']) -%>
+	passenger_base_uri   <%= @params['passenger_base_uri'] %>; ##should be symlink to public dir of actual rails_app
+	<%- end -%>
 
 
+
+
+
+	<%- if @params['enable_php'] -%>
 	#php
-	#location ~ \.php\$
-        #{
-        #	try_files      \$uri =404;
-        #	fastcgi_pass   unix:/var/run/php-fpm.sock ;
-        #	include        $NGINX_CONF_PATH/fastcgi_params;
-        #}
+	location ~ .php$
+        {
+        	try_files      $uri =404;
+		fastcgi_pass   <%= @params['php_fastcgi_socket'] ? @params['php_fastcgi_socket'] : "unix:/var/run/php5-fpm.sock" %>;
+		include        <%= node['nginx']['dir'] %>/fastcgi_params;
+	}
+	<%- end -%>
 
-        #perl
-        #location ~ \.pl\$
-        #{
-        #	fastcgi_pass   unix:/var/run/fcgiwrap.socket ;
-        #	include        $NGINX_CONF_PATH/fastcgi_params;
-	#}
+	<%- if @params['enable_fcgiwrap'] -%>
+	#fcgiwrap
+	location ~ <%= @params['fcgiwrap_location_match'] ? @params['fcgiwrap_location_match'] :  '.cgi$' %>
+        {
+		fastcgi_pass   <%= @params['fcgiwrap_fastcgi_socket'] ? @params['fcgiwrap_fastcgi_socket'] : "unix:/var/run/fcgiwrap.socket" %> ;
+		include        <%= node['nginx']['dir'] %>/fastcgi_params;
 
+	}
+	<%- end -%>
+
+	<%= @params['disable_gnu_terry_pratchett'] ? '' : 'add_header         X-Clacks-Overhead "GNU Terry Pratchett" ;' %>
 }
