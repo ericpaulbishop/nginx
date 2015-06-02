@@ -2,15 +2,31 @@ server
 {
 	server_name          <%= (@params['server_name']).kind_of?(Array) ? (@params['server_name']).join(' ') : ( @params['server_name'] ?  @params['server_name'] : node['hostname'] )    %>;
 	listen               <%= @params['port'] ? (@params['port']).to_s : (@params['ssl_cert'] && @params['ssl_key']   ? '443' : '80' )                                                   %>;
+	<%= @params['port_ipv6'] ? "listen               #{ @params['port_ipv6'] }" : ''                                                                                                    %>
+
 	root                 <%= @params['root']                                                                                                                                            %>;
 	index                <%= (@params['index']).kind_of?(Array)  ? (@params['index']).join(' ') : ( @params['index'] ?  @params['index'] : 'index.html index.htm index.php index.cgi')  %>;
 
+
+
+
+
+
 	<%= (@params['log_file']).nil? ? '' : 'log file             ' + @params['log_file'] + ";" %>
+
+	<%- if @params['ssl_cert'] && @params['ssl_key'] -%>
+	ssl on;
+	ssl_certificate            <%= @params['ssl_cert'] %>;
+	ssl_certificate_key        <%= @params['ssl_key']  %>;
+
+	ssl_session_cache          <%= @params['ssl_session_cache']         ? @params['ssl_session_cache']         : 'builtin:1000  shared:SSL:10m' %>;
+	ssl_protocols              <%= @params['ssl_protocols']             ? @params['ssl_protocols']             : 'TLSv1 TLSv1.1 TLSv1.2' %>;
+	ssl_ciphers                <%= @params['ssl_ciphers']               ? @params['ciphers']                   : 'HIGH:!aNULL:!eNULL:!EXPORT:!CAMELLIA:!DES:!MD5:!PSK:!RC4' %>;
+	ssl_prefer_server_ciphers  <%= @params['ssl_prefer_server_ciphers'] ? @params['ssl_prefer_server_ciphers'] : "on" %>;
 	
-	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl                  on;" : "" -%>
-	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl_certificate      #{ @params['ssl_cert'] };" : "" %>
-	<%= @params['ssl_cert'] && @params['ssl_key']   ?  "ssl_certificate_key  #{ @params['ssl_key'] };"  : "" %>
-	
+	<%- end -%>
+
+
 	<%- if @params['error_pages'] -%>
 	<%-   (@params['error_pages']).each do | err_num, url | -%>
 	<%= "error_page           " + err_num.to_s + "   " + url.to_s + ";"%>
@@ -47,7 +63,6 @@ server
 	<%- if @params['enable_php'] -%>
 	#php
 	location ~ <%= @params['php_location_match'] ? @params['php_location_match'] :  '\.php$' %>
-
         {
         	try_files      $uri =404;
 		fastcgi_pass   <%= @params['php_fastcgi_socket'] ? @params['php_fastcgi_socket'] : "unix:/var/run/php5-fpm.sock" %>;
@@ -66,4 +81,19 @@ server
 	<%- end -%>
 
 	<%= @params['disable_gnu_terry_pratchett'] ? '' : 'add_header         X-Clacks-Overhead "GNU Terry Pratchett" ;' %>
+	
+	<%- if @params['locations'] -%>
+	<%-   (@params['locations']).each do |location, pass_data| -%>
+	location  <%=  @params['locations'][location]['match_type'] ? @params['locations'][location]['match_type'] + " " + location : " " + location %>
+	{
+	<%-     (@params['locations'][location]).each do |variable, value| -%>
+	<%-       if variable != "match_type" && value != '' -%>
+		<%= variable %>   <%= value %>;
+	<%-       end -%>
+	<%-     end -%>
+	}
+	
+	<%-   end -%>
+	<%- end -%>
+	
 }
