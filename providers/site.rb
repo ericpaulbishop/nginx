@@ -28,7 +28,13 @@ action :enable do
   tc = new_resource.template ? new_resource.template_cookbook : "nginx"
   t  = new_resource.template ? new_resource.template : "nginx-site.erb"
   
-  template "#{node['nginx']['dir']}/sites-available/#{new_resource.name}" do
+  # template is only created if template_params are specified, allowing option
+  # to control file contents with external template resource
+  #
+  # However, you get warnings of duplicate template resources when this is the case
+  # To deal with this, define template name as garbage if it isn't used
+  
+  template "#{ new_resource.template_params  ?  node['nginx']['dir']  : '/dev/null/blah/blahblah/garbage' }/sites-available/#{new_resource.name}" do
     source     t
     cookbook   tc if tc
     local      new_resource.template_is_local  if new_resource.template_is_local
@@ -52,19 +58,6 @@ action :enable do
 end
 
 action :disable do 
-  
-  tc = new_resource.template ? new_resource.template_cookbook : "nginx"
-  t  = new_resource.template ? new_resource.template : "nginx-site.erb"
-  
-  template "#{node['nginx']['dir']}/sites-available/#{new_resource.name}" do
-    source     t
-    cookbook   tc if tc
-    local      new_resource.template_is_local  if new_resource.template_is_local
-    mode       new_resource.config_config_file_mode
-    owner      new_resource.config_config_file_owner
-    variables( :params => new_resource.template_params )
-    only_if    { new_resource.template_params }
-  end
   
   execute "nxdissite #{new_resource.name}" do
     command "#{node['nginx']['script_dir']}/nxdissite #{new_resource.name}"
