@@ -24,19 +24,20 @@ def whyrun_supported?
 end
 
 action :enable do
-	
-  if new_resource.params
-    template "#{node['nginx']['dir']}/sites-available/#{new_resource.name}" do
-      source     new_resource.template
-      cookbook   new_resource.template_cookbook  if new_resource.template_cookbook
-      local      new_resource.template_is_local  if new_resource.template_is_local
-      mode       new_resource.file_mode
-      owner      new_resource.file_owner
-      variables( :params => new_resource.template_params )
-      only_if new_resource.template_params
-    end
-  end
+
+  tc = new_resource.template ? new_resource.template_cookbook : "nginx"
+  t  = new_resource.template ? new_resource.template : "nginx-site.erb"
   
+  template "#{node['nginx']['dir']}/sites-available/#{new_resource.name}" do
+    source     t
+    cookbook   tc if tc
+    local      new_resource.template_is_local  if new_resource.template_is_local
+    mode       new_resource.config_file_mode
+    owner      new_resource.config_file_owner
+    variables( :params => new_resource.template_params )
+    only_if    { new_resource.template_params }
+  end
+
   execute "nxensite #{new_resource.name}" do
     command "#{node['nginx']['script_dir']}/nxensite #{new_resource.name}"
     notifies :reload, 'service[nginx]', new_resource.timing
@@ -50,16 +51,17 @@ end
 
 action :disable do 
   
-  if new_resource.params
-    template "#{node['nginx']['dir']}/sites-available/#{new_resource.name}" do
-      source     new_resource.template
-      cookbook   new_resource.template_cookbook  if new_resource.template_cookbook
-      local      new_resource.template_is_local  if new_resource.template_is_local
-      mode       new_resource.config_file_mode
-      owner      new_resource.config_file_owner
-      variables( :params => new_resource.template_params )
-      only_if new_resource.template_params
-    end
+  tc = new_resource.template ? new_resource.template_cookbook : "nginx"
+  t  = new_resource.template ? new_resource.template : "nginx-site.erb"
+  
+  template "#{node['nginx']['dir']}/sites-available/#{new_resource.name}" do
+    source     t
+    cookbook   tc if tc
+    local      new_resource.template_is_local  if new_resource.template_is_local
+    mode       new_resource.config_config_file_mode
+    owner      new_resource.config_config_file_owner
+    variables( :params => new_resource.template_params )
+    only_if    { new_resource.template_params }
   end
   
   execute "nxdissite #{new_resource.name}" do

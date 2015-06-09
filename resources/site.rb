@@ -18,17 +18,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-actions        :enable, :disable, :delete
+actions        :enable, :disable, :delete, :default => :enable 
 default_action :enable
 
 attribute :name,              :kind_of => String, :name_attribute => true
-attribute :timing,            :equal_to => [ :delayed, :immediately ], :default => :delayed, 
+attribute :timing,            :equal_to => [ :delayed, :immediately ], :default => :delayed 
 
 attribute :config_file_mode,  :kind_of => String, :default => '644'
 attribute :config_file_owner, :kind_of => String, :default => 'root'
 
-attribute :template,          :kind_of => String, :default => "nginx-site.erb"
+attribute :template,          :kind_of => String
 attribute :template_cookbook, :kind_of => String
 attribute :template_is_local, :kind_of => String 
 attribute :template_params,   :kind_of => Hash
