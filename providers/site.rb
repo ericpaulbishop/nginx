@@ -47,6 +47,8 @@ action :enable do
     end
   end
   
+  new_resource.updated_by_last_action(true)
+
 end
 
 action :disable do 
@@ -73,6 +75,7 @@ action :disable do
     end
   end
 
+  new_resource.updated_by_last_action(true)
 
 end
 
@@ -89,6 +92,8 @@ action :delete do
   file "#{node['nginx']['dir']}/sites-available/#{new_resource.name}" do
     action :delete
   end
+
+  new_resource.updated_by_last_action(true)
 
 end
 
