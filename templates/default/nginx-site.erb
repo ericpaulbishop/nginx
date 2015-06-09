@@ -64,10 +64,10 @@ server
 	<%-   if (special_variables[variable]).nil? && value.to_s != '' -%>
 	<%-     if value.kind_of?(Array) -%>
 	<%-       value.each do |next_val|    -%>
-	<%= variable %>      <%= next_val %>;
+	<%= variable.to_s %>      <%= next_val.to_s %>;
 	<%-       end -%>
 	<%-     else -%>
-	<%= variable %>      <%= value %>;
+	<%= variable.to_s %>      <%= value.to_s %>;
 	<%-     end -%>
 	<%-   end -%>
 	<%- end -%>
@@ -81,7 +81,13 @@ server
 	{
 	<%-     (@params['locations'][location]).each do |variable, value| -%>
 	<%-       if variable != "match_type" && value.to_s != '' -%>
-		<%= variable.to_s %>   <%= value.to_s %>;
+	<%-         if value.kind_of?(Array) -%>
+	<%-           value.each do |next_val|    -%>
+	<%= variable.to_s %>      <%= next_val.to_s %>;
+	<%-           end -%>
+	<%-         else -%>
+	<%= variable.to_s %>      <%= value.to_s %>;
+	<%-         end -%>
 	<%-       end -%>
 	<%-     end -%>
 	}
